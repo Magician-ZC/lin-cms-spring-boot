@@ -3,13 +3,14 @@ package io.github.talelin.latticy.controller.v1;
 import io.github.talelin.autoconfigure.exception.NotFoundException;
 import io.github.talelin.core.annotation.GroupRequired;
 import io.github.talelin.core.annotation.PermissionMeta;
-import io.github.talelin.latticy.dto.book.CreateOrUpdateBookDTO;
 import io.github.talelin.latticy.dto.device.CreateOrUpdateDeviceDTO;
-import io.github.talelin.latticy.model.BookDO;
 import io.github.talelin.latticy.model.DeviceDO;
+import io.github.talelin.latticy.model.InsAccountInfoDO;
 import io.github.talelin.latticy.service.DeviceService;
+import io.github.talelin.latticy.service.InsAccountInfoService;
 import io.github.talelin.latticy.vo.CreatedVO;
 import io.github.talelin.latticy.vo.DeletedVO;
+import io.github.talelin.latticy.vo.OperateVO;
 import io.github.talelin.latticy.vo.UpdatedVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -29,6 +30,9 @@ public class DeviceController {
 
     @Autowired
     private DeviceService deviceService;
+
+    @Autowired
+    private InsAccountInfoService insAccountInfoService;
 
 
     @GetMapping("/{id}")
@@ -53,9 +57,9 @@ public class DeviceController {
     @PostMapping("")
     public CreatedVO createDevice(@RequestBody @Validated CreateOrUpdateDeviceDTO validator) {
         DeviceDO device = deviceService.getByDeviceId(validator.getDeviceId());
-        if(device == null){
+        if (device == null) {
             deviceService.createDevice(validator);
-        }else{
+        } else {
             throw new NotFoundException(10301);
         }
         return new CreatedVO(16);
@@ -82,5 +86,30 @@ public class DeviceController {
         }
         deviceService.deleteById(device.getId());
         return new DeletedVO(18);
+    }
+
+    @PutMapping("/{id}")
+    public OperateVO startTask(@PathVariable("id") @Positive(message = "{id.positive}") Integer id) {
+        //获取当前设备信息
+        DeviceDO device = deviceService.getById(id);
+        //获取账号信息
+        List<InsAccountInfoDO> insAccountInfoList = insAccountInfoService.findAll();
+        for (int i = 0; i < insAccountInfoList.size(); i++) {
+            InsAccountInfoDO insAccountInfo = insAccountInfoList.get(i);
+            //账号信息正常进入下一步,否则继续下一行
+            if (insAccountInfo.getStatus() == 0) {
+                //如果账号信息上一次被发送给该设备或者该账号信息没有被使用过,继续发送给该设备
+                if (insAccountInfo.getLastDeviceId() == null || device.getDeviceId() == insAccountInfo.getLastDeviceId()) {
+                    //继续给这台设备发送指令
+                    break;
+                } else {
+                    continue;
+                }
+            } else {
+                continue;
+            }
+        }
+
+        return new OperateVO(19);
     }
 }
