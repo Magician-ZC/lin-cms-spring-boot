@@ -19,6 +19,11 @@ public interface DeviceMapper extends BaseMapper<DeviceDO> {
     List<DeviceDO> getDeviceByOnline(int online);
 
 
+    /**
+     * 根据设备id查询设备
+     * @param deviceId
+     * @return
+     */
     DeviceDO getByDeviceId(String deviceId);
 
     @Override

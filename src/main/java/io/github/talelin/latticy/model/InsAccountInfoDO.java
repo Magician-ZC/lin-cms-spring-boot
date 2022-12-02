@@ -35,6 +35,9 @@ public class InsAccountInfoDO extends BaseModel implements Serializable {
      */
     private String password;
 
+    /**
+     * 最后一次使用的设备id
+     */
     private String lastDeviceId;
 
     /**
@@ -42,9 +45,5 @@ public class InsAccountInfoDO extends BaseModel implements Serializable {
      */
     private Integer status;
 
-    /**
-     * 0空闲 1运行中
-     */
-    private Integer taskStatus;
 
 }
