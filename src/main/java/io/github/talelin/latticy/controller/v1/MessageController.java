@@ -34,7 +34,7 @@ public class MessageController {
     public MessageDO getMessage(@PathVariable(value = "id") @Positive(message = "{id.positive}") Integer id) {
         MessageDO message = messageService.getById(id);
         if (message == null) {
-            throw new NotFoundException(10304);
+            throw new NotFoundException(10303);
         }
         return message;
     }
