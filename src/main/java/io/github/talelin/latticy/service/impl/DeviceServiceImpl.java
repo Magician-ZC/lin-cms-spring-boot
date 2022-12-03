@@ -49,9 +49,9 @@ public class DeviceServiceImpl implements DeviceService {
         DeviceDO device = new DeviceDO();
         device.setDeviceId(validator.getDeviceId());
         device.setDeviceTag(validator.getDeviceTag());
-        device.setOnline(validator.getOnline());
-        device.setTaskStatus(validator.getTaskStatus());
-        device.setVersion(validator.getVersion());
+        device.setOnline(0);
+        device.setTaskStatus(0);
+        device.setVersion(1);
         return mDeviceMapper.insert(device) > 0;
     }
 

@@ -25,6 +25,5 @@ public class CreateOrUpdateDeviceDTO {
 
     private Integer taskStatus;
 
-    @NotEmpty(message = "{必须传入设备版本号}")
     private Integer version;
 }

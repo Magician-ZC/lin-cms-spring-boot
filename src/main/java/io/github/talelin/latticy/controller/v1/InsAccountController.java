@@ -50,7 +50,11 @@ public class InsAccountController {
 
     @PostMapping("")
     public CreatedVO createInsAccount(@RequestBody @Validated CreateOrUpdateAccountDTO validator) {
-        insAccountInfoService.createInsAccount(validator);
+        if(insAccountInfoService.isExistInsAccount(validator.getUsername())){
+            throw new NotFoundException(10304);
+        }else{
+            insAccountInfoService.createInsAccount(validator);
+        }
         return new CreatedVO(20);
     }
 

@@ -37,6 +37,11 @@ public class InsAccountInfoServiceImpl implements InsAccountInfoService {
     }
 
     @Override
+    public boolean isExistInsAccount(String username) {
+        return mInsAccountInfoMapper.selectCountByUsername(username) > 0;
+    }
+
+    @Override
     public InsAccountInfoDO getById(Integer id) {
         return mInsAccountInfoMapper.selectById(id);
     }

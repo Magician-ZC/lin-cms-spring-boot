@@ -36,6 +36,13 @@ public interface InsAccountInfoService {
     List<InsAccountInfoDO> findAll();
 
     /**
+     * 根据用户名查询该账号是否存在
+     * @param username
+     * @return
+     */
+    boolean isExistInsAccount(String username);
+
+    /**
      * 获取ins账号
      * @param id 主键id
      * @return ins账号数据对象
