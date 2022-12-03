@@ -12,4 +12,13 @@
         <result column="is_deleted" property="isDeleted"/>
     </resultMap>
 
+
+    <select id="selectCountByUsername" resultType="java.lang.Integer">
+        SELECT COUNT(*) AS count
+        FROM ins_send_user_info AS i
+        WHERE
+            i.username = #{username}
+          AND
+            i.is_deleted = 0
+    </select>
 </mapper>

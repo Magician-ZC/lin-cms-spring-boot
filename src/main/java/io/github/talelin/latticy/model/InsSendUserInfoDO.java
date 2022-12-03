@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 @Data
 @TableName("ins_send_user_info")
-public class InsSendUserInfoDO implements Serializable {
+public class InsSendUserInfoDO extends BaseModel implements Serializable {
     private static final long serialVersionUID = 1736445224925724513L;
 
     /**

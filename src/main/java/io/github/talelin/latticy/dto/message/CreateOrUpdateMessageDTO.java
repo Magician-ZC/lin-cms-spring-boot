@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotEmpty;
 
 /**
- * 设备创建/更新数据传输对象
+ * 信息模板创建/更新数据传输对象
  */
 @Data
 @NoArgsConstructor
