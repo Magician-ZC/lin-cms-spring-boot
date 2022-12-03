@@ -2,6 +2,7 @@ package io.github.talelin.latticy.service;
 
 import io.github.talelin.latticy.dto.book.CreateOrUpdateBookDTO;
 import io.github.talelin.latticy.dto.message.CreateOrUpdateMessageDTO;
+import io.github.talelin.latticy.model.BookDO;
 import io.github.talelin.latticy.model.InsAccountInfoDO;
 import io.github.talelin.latticy.model.MessageDO;
 
@@ -18,6 +19,14 @@ public interface MessageService {
      * @return 是否成功
      */
     boolean createMessage(CreateOrUpdateMessageDTO validator);
+
+    /**
+     * 更新信息模板
+     * @param message 信息模板对象
+     * @param validator 数据传输对象
+     * @return 是否更新成功
+     */
+    boolean updateMessage(MessageDO message, CreateOrUpdateMessageDTO validator);
 
     /**
      * 查询所有信息模板

@@ -24,6 +24,13 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public boolean updateMessage(MessageDO message, CreateOrUpdateMessageDTO validator) {
+        message.setContent(validator.getContent());
+        message.setImgUrl(validator.getImgUrl());
+        return messageMapper.updateById(message) > 0;
+    }
+
+    @Override
     public List<MessageDO> findAll() {
         return messageMapper.selectList(null);
     }
