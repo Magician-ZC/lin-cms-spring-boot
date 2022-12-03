@@ -88,7 +88,7 @@ public class DeviceController {
         return new DeletedVO(18);
     }
 
-    @PutMapping("/{id}")
+    @PostMapping("/{id}")
     public OperateVO startTask(@PathVariable("id") @Positive(message = "{id.positive}") Integer id) {
         //获取当前设备信息
         DeviceDO device = deviceService.getById(id);

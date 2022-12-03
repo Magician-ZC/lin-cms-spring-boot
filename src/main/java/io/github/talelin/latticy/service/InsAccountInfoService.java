@@ -1,6 +1,7 @@
 package io.github.talelin.latticy.service;
 
 
+import io.github.talelin.latticy.model.BookDO;
 import io.github.talelin.latticy.model.InsAccountInfoDO;
 
 import java.util.List;
@@ -15,4 +16,19 @@ public interface InsAccountInfoService {
      * @return
      */
     List<InsAccountInfoDO> findAll();
+
+    /**
+     * 获取ins账号
+     * @param id 主键id
+     * @return ins账号数据对象
+     */
+    InsAccountInfoDO getById(Integer id);
+
+
+    /**
+     * 删除ins账号
+     * @param id 主键id
+     * @return 是否删除成功
+     */
+    boolean deleteById(Integer id);
 }

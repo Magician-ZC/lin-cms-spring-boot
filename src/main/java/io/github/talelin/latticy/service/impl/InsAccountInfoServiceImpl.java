@@ -18,4 +18,14 @@ public class InsAccountInfoServiceImpl implements InsAccountInfoService {
     public List<InsAccountInfoDO> findAll() {
         return mInsAccountInfoMapper.selectList(null);
     }
+
+    @Override
+    public InsAccountInfoDO getById(Integer id) {
+        return mInsAccountInfoMapper.selectById(id);
+    }
+
+    @Override
+    public boolean deleteById(Integer id) {
+        return mInsAccountInfoMapper.deleteById(id)>0;
+    }
 }
