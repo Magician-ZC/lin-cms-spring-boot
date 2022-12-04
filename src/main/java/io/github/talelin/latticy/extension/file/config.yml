@@ -11,6 +11,7 @@ lin:
       - .jpg
       - .png
       - .jpeg
+      - .txt
     # 文件最大数量
     nums: 10
     # 服务器文件路径

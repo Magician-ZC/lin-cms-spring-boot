@@ -3,6 +3,7 @@ package io.github.talelin.latticy.controller.cms;
 import io.github.talelin.core.annotation.LoginRequired;
 import io.github.talelin.latticy.bo.FileBO;
 import io.github.talelin.latticy.service.FileService;
+import io.github.talelin.latticy.vo.OperateVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,5 +38,14 @@ public class FileController {
         MultiValueMap<String, MultipartFile> fileMap =
                 multipartHttpServletRequest.getMultiFileMap();
         return fileService.upload(fileMap);
+    }
+
+    @PostMapping("/text")
+    @LoginRequired
+    public OperateVO uploadText(MultipartHttpServletRequest multipartHttpServletRequest) {
+        MultiValueMap<String, MultipartFile> fileMap =
+                multipartHttpServletRequest.getMultiFileMap();
+        fileService.upload(fileMap);
+        return new OperateVO(31);
     }
 }
