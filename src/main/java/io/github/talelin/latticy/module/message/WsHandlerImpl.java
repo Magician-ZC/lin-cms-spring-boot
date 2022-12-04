@@ -4,6 +4,7 @@ import io.github.talelin.latticy.model.UserDO;
 import io.github.talelin.latticy.service.GroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -20,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * websocket实现类
  */
 @Slf4j
+@Service
 public class WsHandlerImpl implements WsHandler {
 
     private final AtomicInteger connectionCount = new AtomicInteger(0);
