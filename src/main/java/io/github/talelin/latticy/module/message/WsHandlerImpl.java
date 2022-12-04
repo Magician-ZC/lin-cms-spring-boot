@@ -48,6 +48,7 @@ public class WsHandlerImpl implements WsHandler {
     @Override
     public void handleMessage(WebSocketSession session, String message) {
         // 只处理前端传来的文本消息，并且直接丢弃了客户端传来的消息
+        System.out.println(message);
     }
 
     @Override

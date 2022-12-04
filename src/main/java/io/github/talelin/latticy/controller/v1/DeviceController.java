@@ -23,8 +23,10 @@ import org.springframework.web.socket.WebSocketSession;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * 设备控制器
@@ -139,13 +141,18 @@ public class DeviceController {
             command.setSendUsername(receiver.getUsername());
             command.setMsg(message.getContent());
         }
-
-        try {
-            wsHandler.sendMessage(1,command.toString());
-        } catch (IOException e) {
-            return new OperateVO(31);
+        Set<WebSocketSession> sessionSet = new HashSet<>(wsHandler.getSessions());
+        for (WebSocketSession session: sessionSet){
+            if(session.getUri().getQuery().equals(device.getDeviceId())){
+                try {
+                    wsHandler.sendMessage(session,command.toString());
+                    return new OperateVO(31);
+                } catch (IOException e) {
+                    return new OperateVO(10400);
+                }
+            }
         }
-        return new OperateVO(30);
+        return new OperateVO(31);
     }
 
     private InsSendUserInfoDO getReceive(List<InsSendUserInfoDO> receiverList){
