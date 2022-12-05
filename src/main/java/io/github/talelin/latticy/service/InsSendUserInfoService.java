@@ -10,11 +10,18 @@ import java.util.List;
  */
 public interface InsSendUserInfoService {
     /**
-     * 新增发送信息对象
+     * 前端新增发送信息对象
      * @param validator 数据传输对象
      * @return 是否成功
      */
     boolean createInsAccount(CreateOrUpdateReceiveDTO validator);
+
+    /**
+     * 后端新增发送信息对象
+     * @param insSendUserInfo 发送信息对象
+     * @return 是否成功
+     */
+    boolean createReceive(InsSendUserInfoDO insSendUserInfo);
 
     /**
      *  前端更新发送信息对象

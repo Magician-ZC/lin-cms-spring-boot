@@ -24,6 +24,12 @@ public class InsSendUserInfoServiceImpl implements InsSendUserInfoService {
     }
 
     @Override
+    public boolean createReceive(InsSendUserInfoDO insSendUserInfo) {
+        insSendUserInfo.setStatus(0);
+        return mInsSendUserInfoMapper.insert(insSendUserInfo) > 0;
+    }
+
+    @Override
     public boolean updateInsAccount(InsSendUserInfoDO insSendUserInfo, CreateOrUpdateReceiveDTO validator) {
         insSendUserInfo.setUsername(validator.getUsername());
         return mInsSendUserInfoMapper.updateById(insSendUserInfo)>0;
