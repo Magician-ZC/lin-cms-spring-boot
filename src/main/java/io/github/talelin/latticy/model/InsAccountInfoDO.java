@@ -46,4 +46,8 @@ public class InsAccountInfoDO extends BaseModel implements Serializable {
     private Integer status;
 
 
+    /**
+     * 发送次数
+     */
+    private Integer count;
 }

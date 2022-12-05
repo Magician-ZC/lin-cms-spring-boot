@@ -32,7 +32,7 @@ public class DeviceDO extends BaseModel implements Serializable {
      */
     private String deviceTag;
     /**
-     * 是否在线
+     * 是否在线0 离线，1 在线
      */
     private Integer online;
 

@@ -38,7 +38,7 @@
         <if test="online!=null">
             ,online = #{online}
         </if>
-        <if test="taskStatus!=null and taskStatus!=''">
+        <if test="taskStatus!=null">
             ,task_status = #{taskStatus}
         </if>
         <if test="deviceTag!=null and deviceTag!=''">

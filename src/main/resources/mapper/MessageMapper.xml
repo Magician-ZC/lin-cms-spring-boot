@@ -11,5 +11,7 @@
         <result column="delete_time" jdbcType="TIMESTAMP" property="deleteTime"/>
         <result column="is_deleted" property="isDeleted"/>
     </resultMap>
-
+    <select id="selectAll" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT * FROM message
+    </select>
 </mapper>

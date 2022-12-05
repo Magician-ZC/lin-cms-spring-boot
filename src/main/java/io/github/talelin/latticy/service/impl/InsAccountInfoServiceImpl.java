@@ -21,6 +21,7 @@ public class InsAccountInfoServiceImpl implements InsAccountInfoService {
         insAccount.setUsername(validator.getUsername());
         insAccount.setPassword(validator.getPassword());
         insAccount.setStatus(0);
+        insAccount.setCount(0);
         return mInsAccountInfoMapper.insert(insAccount) > 0;
     }
 
@@ -32,8 +33,23 @@ public class InsAccountInfoServiceImpl implements InsAccountInfoService {
     }
 
     @Override
+    public boolean updateInsAccountInfo(InsAccountInfoDO insAccountInfo) {
+        return mInsAccountInfoMapper.updateById(insAccountInfo) > 0;
+    }
+
+    @Override
     public List<InsAccountInfoDO> findAll() {
         return mInsAccountInfoMapper.selectList(null);
+    }
+
+    @Override
+    public List<InsAccountInfoDO> selectAllTask() {
+        return mInsAccountInfoMapper.selectAllTask();
+    }
+
+    @Override
+    public List<InsAccountInfoDO> selectAllTaskByDeviceId(String deviceId) {
+        return mInsAccountInfoMapper.selectAllTaskByDeviceId(deviceId);
     }
 
     @Override
@@ -44,6 +60,11 @@ public class InsAccountInfoServiceImpl implements InsAccountInfoService {
     @Override
     public InsAccountInfoDO getById(Integer id) {
         return mInsAccountInfoMapper.selectById(id);
+    }
+
+    @Override
+    public InsAccountInfoDO selectByUsername(String username) {
+        return mInsAccountInfoMapper.selectByUsername(username);
     }
 
     @Override

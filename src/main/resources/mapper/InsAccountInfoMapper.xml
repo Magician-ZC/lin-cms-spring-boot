@@ -8,6 +8,7 @@
         <result column="password" jdbcType="VARCHAR" property="password"/>
         <result column="last_device_id" jdbcType="VARCHAR" property="lastDeviceId"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="count" jdbcType="INTEGER" property="count"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="delete_time" jdbcType="TIMESTAMP" property="deleteTime"/>
@@ -21,5 +22,34 @@
             i.username = #{username}
           AND
             i.is_deleted = 0
+    </select>
+
+    <select id="selectByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT * FROM
+            ins_account_info AS i
+        WHERE
+            i.username = #{username}
+          AND
+            i.is_deleted = 0
+    </select>
+
+    <select id="selectAllTaskByDeviceId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT * FROM ins_account_info as i
+        WHERE
+            i.is_deleted = 0
+          AND
+            i.status = 0
+        AND
+            i.last_device_id =  #{deviceId}
+    </select>
+
+    <select id="selectAllTask" resultMap="BaseResultMap">
+        SELECT * FROM ins_account_info as i
+        WHERE
+            i.is_deleted = 0
+          AND
+            i.status = 0
+            AND
+              i.last_device_id is null
     </select>
 </mapper>

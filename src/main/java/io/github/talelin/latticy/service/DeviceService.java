@@ -34,17 +34,17 @@ public interface DeviceService {
     DeviceDO getByDeviceId(String deviceId);
 
     /**
-     * 更新设备
+     * 后端更新设备
      * @param device 设备对象
      * @return 是否更新成功
      */
-    boolean updateDevice(DeviceDO device,CreateOrUpdateDeviceDTO validator);
+    boolean updateDevice(DeviceDO device);
 
     /**
      * 新增设备
      * @return 是否成功
      */
-    boolean createDevice(CreateOrUpdateDeviceDTO validator);
+    boolean createDevice(DeviceDO device);
 
     /**
      * 查询所有设备

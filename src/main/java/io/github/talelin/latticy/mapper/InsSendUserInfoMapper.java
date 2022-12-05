@@ -16,4 +16,10 @@ public interface InsSendUserInfoMapper extends BaseMapper<InsSendUserInfoDO> {
      * @return
      */
     int selectCountByUsername(String username);
+
+    /**
+     * 根据用户名发送对象信息
+     * @return
+     */
+    InsSendUserInfoDO selectByUsername(String username);
 }

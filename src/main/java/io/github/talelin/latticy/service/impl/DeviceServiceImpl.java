@@ -36,20 +36,13 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public boolean updateDevice(DeviceDO device,CreateOrUpdateDeviceDTO validator) {
-        device.setDeviceTag(validator.getDeviceTag());
-        device.setOnline(validator.getOnline());
-        device.setVersion(validator.getVersion());
-        device.setTaskStatus(validator.getTaskStatus());
+    public boolean updateDevice(DeviceDO device) {
         return mDeviceMapper.updateById(device)>0;
     }
 
     @Override
-    public boolean createDevice(CreateOrUpdateDeviceDTO validator) {
-        DeviceDO device = new DeviceDO();
-        device.setDeviceId(validator.getDeviceId());
-        device.setDeviceTag(validator.getDeviceTag());
-        device.setOnline(0);
+    public boolean createDevice(DeviceDO device) {
+        device.setOnline(1);
         device.setTaskStatus(0);
         device.setVersion(1);
         return mDeviceMapper.insert(device) > 0;

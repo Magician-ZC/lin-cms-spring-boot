@@ -18,7 +18,7 @@ public class InsSendUserInfoDO extends BaseModel implements Serializable {
     private static final long serialVersionUID = 1736445224925724513L;
 
     /**
-     * 发送状态 0未发送，1发送成功，2发送失败
+     * 发送状态 0未发送，1发送中，2发送成功
      */
     private Integer status;
 

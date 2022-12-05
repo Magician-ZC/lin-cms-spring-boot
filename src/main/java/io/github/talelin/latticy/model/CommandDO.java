@@ -1,10 +1,6 @@
 package io.github.talelin.latticy.model;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -19,15 +15,9 @@ public class CommandDO implements Serializable {
     private static final long serialVersionUID= 6128988308896525608L;
 
     /**
-     * 设备id
-     */
-    private String deviceId;
-    private Integer action;
-
-    /**
      * 账号名称
      */
-    private String username;
+    private String account;
     /**
      * 账号密码
      */
@@ -36,14 +26,24 @@ public class CommandDO implements Serializable {
     /**
      * 聊天发送对象
      */
-    private String sendUsername;
+    private String sendName;
     /**
      * 聊天内容
      */
-    private String msg;
+    private String msgContent;
     /**
      * 聊天图片地址
      */
-    private String imgUrl;
+    private String msgUrl;
 
+    @Override
+    public String toString() {
+        return "CommandDO{" +
+                "username='" + account + '\'' +
+                ", password='" + password + '\'' +
+                ", sendUsername='" + sendName + '\'' +
+                ", msg='" + msgContent + '\'' +
+                ", imgUrl='" + msgUrl + '\'' +
+                '}';
+    }
 }

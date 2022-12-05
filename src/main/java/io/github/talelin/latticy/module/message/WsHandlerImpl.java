@@ -1,7 +1,16 @@
 package io.github.talelin.latticy.module.message;
 
+import com.alibaba.fastjson.JSONObject;
+import io.github.talelin.latticy.common.util.ConvertGson;
+import io.github.talelin.latticy.common.util.TextUtil;
+import io.github.talelin.latticy.model.DeviceDO;
+import io.github.talelin.latticy.model.InsAccountInfoDO;
+import io.github.talelin.latticy.model.InsSendUserInfoDO;
 import io.github.talelin.latticy.model.UserDO;
+import io.github.talelin.latticy.service.DeviceService;
 import io.github.talelin.latticy.service.GroupService;
+import io.github.talelin.latticy.service.InsAccountInfoService;
+import io.github.talelin.latticy.service.InsSendUserInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +18,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,6 +33,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Service
 public class WsHandlerImpl implements WsHandler {
+
+    @Autowired
+    private DeviceService deviceService;
+
+    @Autowired
+    private InsSendUserInfoService sendUserInfoService;
+
+    @Autowired
+    private InsAccountInfoService accountService;
 
     private final AtomicInteger connectionCount = new AtomicInteger(0);
 
@@ -43,12 +62,88 @@ public class WsHandlerImpl implements WsHandler {
         sessions.remove(session);
         int cnt = connectionCount.decrementAndGet();
         log.info("a connection closed，current online count：{}", cnt);
+
     }
 
     @Override
     public void handleMessage(WebSocketSession session, String message) {
         // 只处理前端传来的文本消息，并且直接丢弃了客户端传来的消息
-        System.out.println(message);
+        JSONObject jsonTo = JSONObject.parseObject(message);
+        String action = (String) jsonTo.get("action");
+        String deviceId = (String) jsonTo.getString("deviceId");
+        String deviceTag = (String) jsonTo.getString("deviceTag");
+        String seqId = (String) jsonTo.getString("seqId");
+        String req = (String)jsonTo.getString("req");
+        JSONObject jsonReq;
+        String account = null;
+        String sendUsername = null;
+        String type = null;
+        if(!TextUtil.isEmpty(req)){
+            jsonReq = JSONObject.parseObject(req);
+            account = jsonReq.getString("account");
+            sendUsername = jsonReq.getString("sendUsername");
+            type = jsonReq.getString("type");
+        }
+        Response response = new Response();
+        DeviceDO device = null;
+        switch (action){
+            case "bind":
+                if(TextUtil.isEmpty(deviceId)){
+                    break;
+                }else{
+                    if(deviceService.getByDeviceId(deviceId)!=null){
+                        device = deviceService.getByDeviceId(deviceId);
+                        device.setDeviceTag(deviceTag);
+                        device.setOnline(1);
+                        deviceService.updateDevice(device);
+                    }else{
+                        device = new DeviceDO();
+                        device.setDeviceId(deviceId);
+                        device.setDeviceTag(deviceTag);
+                        deviceService.createDevice(device);
+                    }
+                    response.setSeqId(seqId);
+                    response.setAction("bind");
+                    response.setType("2");
+                    try {
+                        sendMessage(session, ConvertGson.toJson(response));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case "send_finish":
+                if(TextUtil.isEmpty(deviceId)){
+                    break;
+                }else{
+                    //ins账号更新状态与次数
+                    InsAccountInfoDO insAccountInfo = accountService.selectByUsername(account);
+                    insAccountInfo.setCount(insAccountInfo.getCount()+1);
+                    insAccountInfo.setStatus(Integer.parseInt(type));
+                    accountService.updateInsAccountInfo(insAccountInfo);
+
+                    //接收账号更新状态
+                    InsSendUserInfoDO insSendUserInfo = sendUserInfoService.selectByUsername(sendUsername);
+                    if(TextUtil.equals(type,"0")){
+                        insSendUserInfo.setStatus(2);
+                    }else{
+                        insSendUserInfo.setStatus(0);
+                    }
+                    sendUserInfoService.updateInsAccountStatus(insSendUserInfo);
+
+                    response.setSeqId(seqId);
+                    response.setAction("send_finish");
+                    response.setType("2");
+                    try {
+                        sendMessage(session,ConvertGson.toJson(response));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     @Override

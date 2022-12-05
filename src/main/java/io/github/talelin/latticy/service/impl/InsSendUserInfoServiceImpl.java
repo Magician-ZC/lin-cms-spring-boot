@@ -30,8 +30,18 @@ public class InsSendUserInfoServiceImpl implements InsSendUserInfoService {
     }
 
     @Override
+    public boolean updateInsAccountStatus(InsSendUserInfoDO insSendUserInfo) {
+        return mInsSendUserInfoMapper.updateById(insSendUserInfo)>0;
+    }
+
+    @Override
     public List<InsSendUserInfoDO> findAll() {
         return mInsSendUserInfoMapper.selectList(null);
+    }
+
+    @Override
+    public InsSendUserInfoDO selectByUsername(String username) {
+        return mInsSendUserInfoMapper.selectByUsername(username);
     }
 
     @Override

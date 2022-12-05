@@ -17,18 +17,31 @@ public interface InsSendUserInfoService {
     boolean createInsAccount(CreateOrUpdateReceiveDTO validator);
 
     /**
-     * 更新发送信息对象
+     *  前端更新发送信息对象
      * @param insSendUserInfo 发送信息对象
      * @param validator 数据传输对象
      * @return 是否更新成功
      */
-    boolean updateInsAccount(InsSendUserInfoDO insSendUserInfo, CreateOrUpdateReceiveDTO validator);
+    boolean updateInsAccount(InsSendUserInfoDO insSendUserInfo,CreateOrUpdateReceiveDTO validator);
+
+    /**
+     * 后端更新发送信息对象状态
+     * @param insSendUserInfo 发送信息对象
+     * @return 是否更新成功
+     */
+    boolean updateInsAccountStatus(InsSendUserInfoDO insSendUserInfo);
 
     /**
      * 查询所有发送对象信息
      * @return
      */
     List<InsSendUserInfoDO> findAll();
+
+    /**
+     * 根据用户名查找发送对象信息
+     * @return
+     */
+    InsSendUserInfoDO selectByUsername(String username);
 
     /**
      * 根据用户名查询该账号是否存在

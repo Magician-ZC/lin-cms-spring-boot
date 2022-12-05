@@ -21,4 +21,13 @@
           AND
             i.is_deleted = 0
     </select>
+
+    <select id="selectByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT * FROM
+            ins_send_user_info AS i
+        WHERE
+            i.username = #{username}
+          AND
+            i.is_deleted = 0
+    </select>
 </mapper>

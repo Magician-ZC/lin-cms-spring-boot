@@ -1,17 +1,18 @@
 package io.github.talelin.latticy.controller.v1;
 
+import com.baomidou.mybatisplus.extension.api.R;
 import io.github.talelin.autoconfigure.exception.NotFoundException;
 import io.github.talelin.core.annotation.GroupRequired;
 import io.github.talelin.core.annotation.PermissionMeta;
-import io.github.talelin.latticy.common.LocalUser;
+import io.github.talelin.latticy.common.util.ConvertGson;
 import io.github.talelin.latticy.dto.device.CreateOrUpdateDeviceDTO;
 import io.github.talelin.latticy.model.*;
+import io.github.talelin.latticy.module.message.Response;
 import io.github.talelin.latticy.module.message.WsHandler;
 import io.github.talelin.latticy.service.DeviceService;
 import io.github.talelin.latticy.service.InsAccountInfoService;
 import io.github.talelin.latticy.service.InsSendUserInfoService;
 import io.github.talelin.latticy.service.MessageService;
-import io.github.talelin.latticy.vo.CreatedVO;
 import io.github.talelin.latticy.vo.DeletedVO;
 import io.github.talelin.latticy.vo.OperateVO;
 import io.github.talelin.latticy.vo.UpdatedVO;
@@ -23,10 +24,7 @@ import org.springframework.web.socket.WebSocketSession;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * 设备控制器
@@ -70,24 +68,13 @@ public class DeviceController {
         return deviceService.getAllDeviceByOnline(online);
     }
 
-    @PostMapping("")
-    public CreatedVO createDevice(@RequestBody @Validated CreateOrUpdateDeviceDTO validator) {
-        DeviceDO device = deviceService.getByDeviceId(validator.getDeviceId());
-        if (device == null) {
-            deviceService.createDevice(validator);
-        } else {
-            throw new NotFoundException(10301);
-        }
-        return new CreatedVO(16);
-    }
-
     @PutMapping("/{id}")
-    public UpdatedVO updateDevice(@PathVariable("id") @Positive(message = "{id.positive}") Integer id, @RequestBody @Validated CreateOrUpdateDeviceDTO validator) {
+    public UpdatedVO updateDevice(@PathVariable("id") @Positive(message = "{id.positive}") Integer id) {
         DeviceDO device = deviceService.getById(id);
         if (device == null) {
             throw new NotFoundException(10300);
         }
-        deviceService.updateDevice(device, validator);
+        deviceService.updateDevice(device);
         return new UpdatedVO(17);
     }
 
@@ -104,60 +91,89 @@ public class DeviceController {
         return new DeletedVO(18);
     }
 
-    @PutMapping("/task/{id}")
+    @PutMapping("/task/start/{id}")
     public OperateVO startTask(@PathVariable("id") @Positive(message = "{id.positive}") Integer id) {
         //获取当前设备信息
         DeviceDO device = deviceService.getById(id);
         //获取账号信息
-        List<InsAccountInfoDO> insAccountInfoList = insAccountInfoService.findAll();
+        List<InsAccountInfoDO> insAccountInfoList = insAccountInfoService.selectAllTaskByDeviceId(device.getDeviceId());
+        if (insAccountInfoList == null || insAccountInfoList.size() == 0) {
+            insAccountInfoList = insAccountInfoService.selectAllTask();
+            if (insAccountInfoList == null || insAccountInfoList.size() == 0) {
+                return new OperateVO(10401);
+            }
+        }
         InsAccountInfoDO insAccountInfo = null;
         //获取接受者账号
         List<InsSendUserInfoDO> receiverList = insSendUserInfoService.findAll();
         InsSendUserInfoDO receiver = null;
         //获取发送内容
-        MessageDO message = messageService.getById(1);
+        List<MessageDO> messageList = messageService.findAll();
 
+        MessageDO message = null;
+        if (messageList == null || messageList.size() == 0) {
+            return new OperateVO(10402);
+        }
+        message = messageList.get(0);
         for (int i = 0; i < insAccountInfoList.size(); i++) {
             insAccountInfo = insAccountInfoList.get(i);
-            //账号信息正常进入下一步,否则继续下一行
-            if (insAccountInfo.getStatus() == 0) {
-                //如果账号信息上一次被发送给该设备或者该账号信息没有被使用过,继续发送给该设备
-                if (insAccountInfo.getLastDeviceId() == null || device.getDeviceId() == insAccountInfo.getLastDeviceId()) {
-                    //继续给这台设备发送指令
-                    receiver = getReceive(receiverList);
-                    break;
-                } else {
-                    continue;
-                }
-            } else {
-                continue;
-            }
+            //继续给这台设备发送指令
+            receiver = getReceive(receiverList);
+            break;
+        }
+        if (receiver == null) {
+            return new OperateVO(10403);
         }
         CommandDO command = new CommandDO();
-        if(insAccountInfo != null && receiver != null && message != null){
-            command.setDeviceId(device.getDeviceId());
-            command.setUsername(insAccountInfo.getUsername());
-            command.setPassword(insAccountInfo.getPassword());
-            command.setSendUsername(receiver.getUsername());
-            command.setMsg(message.getContent());
-        }
-        Set<WebSocketSession> sessionSet = new HashSet<>(wsHandler.getSessions());
-        for (WebSocketSession session: sessionSet){
-            if(session.getUri().getQuery().equals(device.getDeviceId())){
+        command.setAccount(insAccountInfo.getUsername());
+        command.setPassword(insAccountInfo.getPassword());
+        command.setSendName(receiver.getUsername());
+        command.setMsgContent(message.getContent());
+        command.setMsgUrl(message.getImgUrl());
+
+        Response response = new Response();
+        response.setAction("auto_send");
+        response.setType("1");
+        response.setResp(ConvertGson.toJson(command));
+        for (WebSocketSession session : wsHandler.getSessions()) {
+            if (session.getUri().getQuery().equals(device.getDeviceId())) {
                 try {
-                    wsHandler.sendMessage(session,command.toString());
+                    //接收者账号更新状态
+                    receiver.setStatus(1);
+                    insSendUserInfoService.updateInsAccountStatus(receiver);
+                    //ins账号更新设备id
+                    insAccountInfo.setLastDeviceId(device.getDeviceId());
+                    insAccountInfoService.updateInsAccountInfo(insAccountInfo);
+                    //设备工作状态更新
+                    device.setTaskStatus(1);
+                    deviceService.updateDevice(device);
+                    wsHandler.sendMessage(session, ConvertGson.toJson(response));
                     return new OperateVO(31);
                 } catch (IOException e) {
                     return new OperateVO(10400);
                 }
             }
         }
-        return new OperateVO(31);
+        return new OperateVO(10400);
     }
 
-    private InsSendUserInfoDO getReceive(List<InsSendUserInfoDO> receiverList){
-        for (InsSendUserInfoDO receiver:receiverList) {
-            if(receiver.getStatus() == 0){
+    @PutMapping("/task/stop/{id}")
+    public OperateVO stopTask(@PathVariable("id") @Positive(message = "{id.positive}") Integer id) {
+        DeviceDO device = deviceService.getById(id);
+        if (device == null) {
+            return new OperateVO(10300);
+        }
+        device.setTaskStatus(0);
+        if (deviceService.updateDevice(device)) {
+            return new OperateVO(31);
+        } else {
+            return new OperateVO(10400);
+        }
+    }
+
+    private InsSendUserInfoDO getReceive(List<InsSendUserInfoDO> receiverList) {
+        for (InsSendUserInfoDO receiver : receiverList) {
+            if (receiver.getStatus() == 0) {
                 return receiver;
             }
         }
