@@ -52,17 +52,32 @@ public class WsHandlerImpl implements WsHandler {
 
     @Override
     public void handleOpen(WebSocketSession session) {
-        sessions.add(session);
         int cnt = connectionCount.incrementAndGet();
         log.info("a new connection opened，current online count：{}", cnt);
+        //设备上线
+        String deviceId = session.getUri().getQuery();
+        DeviceDO device = deviceService.getByDeviceId(deviceId);
+        if(device!=null){
+            device.setOnline(1);
+            device.setTaskStatus(0);
+            deviceService.updateDevice(device);
+        }
+        sessions.add(session);
     }
 
     @Override
     public void handleClose(WebSocketSession session) {
-        sessions.remove(session);
         int cnt = connectionCount.decrementAndGet();
         log.info("a connection closed，current online count：{}", cnt);
-
+        //设备下线
+        String deviceId = session.getUri().getQuery();
+        DeviceDO device = deviceService.getByDeviceId(deviceId);
+        if(device!=null){
+            device.setOnline(0);
+            device.setTaskStatus(0);
+            deviceService.updateDevice(device);
+        }
+        sessions.remove(session);
     }
 
     @Override
@@ -228,6 +243,7 @@ public class WsHandlerImpl implements WsHandler {
     public void handleError(WebSocketSession session, Throwable error) {
         log.error("websocket error：{}，session id： {}", error.getMessage(), session.getId());
         log.error("", error);
+        this.handleClose(session);
     }
 
     @Override
